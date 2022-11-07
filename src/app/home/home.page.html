@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      round-check
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card>
+    <ion-button color="danger" (click)="scanQRcode()" expand="block">
+      Scan QRcode
+    </ion-button>
+  </ion-card>
+
+  <ion-card>
+    <div *ngIf="scannedQRCode">
+      <ion-item>
+        Scanned code output text: <strong>{{ scannedQRCode["text"] }}</strong>
+      </ion-item>
+      <ion-item>
+        Scanned code output format: <strong>{{ scannedQRCode["format"] }}</strong>
+      </ion-item>
+    </div>
+  </ion-card>
+
+  <ion-card>
+    <h3>Generate New QR Code</h3>
+    <ion-input placeholder="Enter Input" [(ngModel)]="encodedData"></ion-input>
+
+    <ion-button color="primary" (click)="generateQRCode()" expand="block">
+        QR Code Create
+    </ion-button>
+</ion-card>
+
+</ion-content>
