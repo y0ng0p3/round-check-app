@@ -13,15 +13,18 @@ import { QRcode } from 'src/app/models/qrcode/qrcode';
   providedIn: 'root'
 })
 export class DataService {
+  qrcodeList = new BehaviorSubject([]);
+  // qrcodeList = [];
   checkList = new BehaviorSubject([]);
+  // checkList = [];
   private db: SQLiteObject;
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private platform: Platform,
     private sqlite: SQLite,
-    private httpClient: HttpClient,
-    private sqlPorter: SQLitePorter,
+    // private httpClient: HttpClient,
+    // private sqlPorter: SQLitePorter,
   ) {
     this.platform.ready().then(() => {
       this.initializeDatabase();
@@ -38,13 +41,13 @@ export class DataService {
       location: 'default'
     })
       .then((db: SQLiteObject) => {
+        console.log({db});
         this.db = db;
 
         this.createTables(db);
         this.setTables(db);
       });
   }
-
 
 
   createTables(sqliteObject: SQLiteObject) {
@@ -266,54 +269,58 @@ export class DataService {
   }
 
   // get qrcodes
-  getQRcodes() {
-    return this.db.executeSql('SELECT * FROM qrcodes', []).then(res => {
-      const items: QRcode[] = [];
-      if (res.rows.length > 0) {
-        for (let i = 0; i < res.rows.length; i++) {
-          items.push({
-            id: res.rows.item(i).id,
-            name: res.rows.item(i).name,
-            checkpointId: res.rows.item(i).checkpoint_id,
-            location: res.rows.item(i).location,
-            thumb: res.rows.item(i).thumb,
-            createdAt: res.row.item(i).created_at,
-            updatedAt: res.row.item(i).updated_at
-          });
-        }
+  async getQRcodes() {
+    const res = await this.db.executeSql('SELECT * FROM qrcodes', []);
+    alert(res);
+    const items: QRcode[] = [];
+    if (res.rows.length > 0) {
+      for (let i = 0; i < res.rows.length; i++) {
+        items.push({
+          id: res.rows.item(i).id,
+          name: res.rows.item(i).name,
+          checkpointId: res.rows.item(i).checkpoint_id,
+          location: res.rows.item(i).location,
+          thumb: res.rows.item(i).thumb,
+          createdAt: res.row.item(i).created_at,
+          updatedAt: res.row.item(i).updated_at
+        });
       }
-      this.checkList.next(items);
-    });
+    }
+    this.qrcodeList.next(items);
+  }
+  // add a qrcode
+  async addQRCode(name: number, location: string, thumb?: string) {
+    const data = [name, 1, location, thumb];
+    const res = await this.db.executeSql('INSERT INTO qrcodes (name, checkpoint_id, location, thumb) VALUES (?, ?, ?, ?)', data);
+    this.getQRcodes();
   }
 
   // get checks
-  getChecks() {
-    return this.db.executeSql('SELECT * FROM checks', []).then(res => {
-      const items: Check[] = [];
-      if (res.rows.length > 0) {
-        for (let i = 0; i < res.rows.length; i++) {
-          items.push({
-            id: res.rows.item(i).id,
-            userId: res.rows.item(i).user_id,
-            qrcodeId: res.rows.item(i).qrcode_id,
-            location: res.rows.item(i).location,
-            isIncident: res.rows.item(i).is_incident,
-            time: res.rows.item(i).time,
-            date: res.rows.item(i).date
-          });
-        }
+  async getChecks() {
+    const res = await this.db.executeSql('SELECT * FROM checks', []);
+    alert(res);
+    const items: Check[] = [];
+    if (res.rows.length > 0) {
+      for (let i = 0; i < res.rows.length; i++) {
+        items.push({
+          id: res.rows.item(i).id,
+          userId: res.rows.item(i).user_id,
+          qrcodeId: res.rows.item(i).qrcode_id,
+          location: res.rows.item(i).location,
+          isIncident: res.rows.item(i).is_incident,
+          time: res.rows.item(i).time,
+          date: res.rows.item(i).date
+        });
       }
-      this.checkList.next(items);
-    });
+    }
+    this.checkList.next(items);
   }
 
   // add a check
-  addCheck(qrcodeId: number, location: string, isIncident?: boolean) {
-    const data = [qrcodeId, location, isIncident];
-    return this.db.executeSql('INSERT INTO checks (qrcode_id, location, is_incident) VALUES (?, ?, ?)', data)
-      .then(res => {
-        this.getChecks();
-      });
+  async addCheck(qrcodeId: number, location: string, isIncident?: boolean) {
+    const data = [qrcodeId, location, isIncident ? 1 : 0];
+    const res = await this.db.executeSql('INSERT INTO checks (qrcode_id, location, is_incident) VALUES (?, ?, ?)', data);
+    this.getChecks();
   }
 
 }
