@@ -1,9 +1,9 @@
 export class Check {
     id: number;
-    userId: number;
     qrcodeId: number;
+    userId: number;
+    location: string;
     time: string;
     date: string;
-    location: string;
     isIncident?: boolean;
 }

@@ -154,12 +154,14 @@ export class DataService {
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS qrcodes(
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        name            TEXT,
-        checkpoint_id   INTEGER,
+        company         INTEGER,
+        site            INTEGER,
+        checkpoint      INTEGER,
         location        TEXT,
+        time            TEXT,
+        date            TEXT,
+        name            TEXT,
         thumb           TEXT,
-        created_at      DATETIME,
-        updated_at      DATETIME
     )`, [])
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
@@ -169,11 +171,12 @@ export class DataService {
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS checks(
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id         INTEGER,
         qrcode_id       INTEGER,
+        user_id         INTEGER,
         location        TEXT,
         is_incident     TINYINT,
-        created_at      DATETIME
+        time            TEXT,
+        date            TEXT,
     )`, [])
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
@@ -245,18 +248,34 @@ export class DataService {
 
     // QRCodes Table
     sqliteObject.executeSql(`
-      INSERT INTO qrcodes 
-      (id, name, checkpoint_id, location, thumb) 
-      values 
-      (1, 'QRCode-Bureau-DG', 1, 'location', 'thumb')`,
-      []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
+      INSERT INTO qrcodes (
+          company,
+          site,
+          checkpoint,
+          location,
+          time,
+          date,
+          name,
+          thumb
+        ) VALUES (
+            'malambi', 
+            'Quartier Général',
+            'QRCode-Bureau-DG', 
+            'location', 
+            '',
+            '',
+            'name',
+            'thumb'
+          )`,
+      []
+    ).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Checks Table
     sqliteObject.executeSql(`
       INSERT INTO checks 
-      (id, user_id, qrcode_id, location, is_incident) 
+      (id, qrcode_id, user_id, location, is_incident, time, date) 
       values 
-      (1, 1, 1, 'location', 0)`,
+      (1, 1, 1, 'location', 0, '', '')`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Incidents Table
@@ -277,28 +296,59 @@ export class DataService {
       for (let i = 0; i < res.rows.length; i++) {
         items.push({
           id: res.rows.item(i).id,
-          name: res.rows.item(i).name,
-          checkpointId: res.rows.item(i).checkpoint_id,
+          company: res.rows.item(i).company,
+          site: res.rows.item(i).site,
+          checkpoint: res.rows.item(i).checkpoint_id,
           location: res.rows.item(i).location,
+          time: res.row.item(i).time,
+          date: res.row.item(i).date,
+          name: res.rows.item(i).name,
           thumb: res.rows.item(i).thumb,
-          createdAt: res.row.item(i).created_at,
-          updatedAt: res.row.item(i).updated_at
         });
       }
     }
     this.qrcodeList.next(items);
   }
   // add a qrcode
-  async addQRCode(name: number, location: string, thumb?: string) {
-    const data = [name, 1, location, thumb];
-    const res = await this.db.executeSql('INSERT INTO qrcodes (name, checkpoint_id, location, thumb) VALUES (?, ?, ?, ?)', data);
+  async addQRCode(
+    company: string,
+    site: string,
+    checkpoint: string,
+    location: string,
+    time: string,
+    date: string,
+    name?: number,
+    thumb?: string
+  ) {
+    const data = [
+      company,
+      site,
+      checkpoint,
+      location,
+      time,
+      date,
+      name,
+      thumb
+    ];
+    const res = await this.db
+      .executeSql(`
+        INSERT INTO qrcodes (
+          company,
+          site,
+          checkpoint,
+          location,
+          time,
+          date,
+          name,
+          thumb
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, data);
     this.getQRcodes();
   }
 
   // get checks
   async getChecks() {
     const res = await this.db.executeSql('SELECT * FROM checks', []);
-    alert(res);
+    // alert(res);
     const items: Check[] = [];
     if (res.rows.length > 0) {
       for (let i = 0; i < res.rows.length; i++) {
@@ -318,8 +368,19 @@ export class DataService {
 
   // add a check
   async addCheck(qrcodeId: number, location: string, isIncident?: boolean) {
-    const data = [qrcodeId, location, isIncident ? 1 : 0];
-    const res = await this.db.executeSql('INSERT INTO checks (qrcode_id, location, is_incident) VALUES (?, ?, ?)', data);
+    const data = [qrcodeId, 1, location, isIncident ? 1 : 0, '', ''];
+    const res = await this.db
+      .executeSql(
+        `INSERT INTO checks (
+          qrcode_id, 
+          user_id, 
+          location, 
+          is_incident, 
+          time, 
+          date
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
+        data
+      );
     this.getChecks();
   }
 
