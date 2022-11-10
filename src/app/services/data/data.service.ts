@@ -26,6 +26,8 @@ export class DataService {
     // private httpClient: HttpClient,
     // private sqlPorter: SQLitePorter,
   ) {
+    const platforms = this.platform.platforms();
+    console.log({ platforms });
     this.platform.ready().then(() => {
       this.initializeDatabase();
     });
@@ -36,12 +38,13 @@ export class DataService {
   }
 
   initializeDatabase() {
+    console.log('Initialize database...');
     this.sqlite.create({
-      name: 'data.db',
+      name: 'roundcheck.db',
       location: 'default'
     })
       .then((db: SQLiteObject) => {
-        console.log({db});
+        console.log('Database created...', { db });
         this.db = db;
 
         this.createTables(db);
@@ -51,7 +54,7 @@ export class DataService {
 
 
   createTables(sqliteObject: SQLiteObject) {
-    // Roles Table
+    /* // Roles Table
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS roles(
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,25 +152,28 @@ export class DataService {
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
       );
-
+ */
     // QRCodes Table
+    console.log('Creating table "qrcodes"...');
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS qrcodes(
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        company         INTEGER,
-        site            INTEGER,
-        checkpoint      INTEGER,
+        company         TEXT,
+        site            TEXT,
+        checkpoint      TEXT,
         location        TEXT,
         time            TEXT,
         date            TEXT,
         name            TEXT,
         thumb           TEXT,
     )`, [])
+      .then(() => console.log('Table "qrcodes" created.'))
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
       );
 
     // Checks Table
+    console.log('Creating table "checks"...');
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS checks(
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -178,11 +184,12 @@ export class DataService {
         time            TEXT,
         date            TEXT,
     )`, [])
+      .then(() => console.log('Table "checks" created.'))
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
       );
 
-    // Incidents Table
+    /* // Incidents Table
     sqliteObject.executeSql(`
         CREATE TABLE IF NOT EXISTS incidents(
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -194,59 +201,60 @@ export class DataService {
     )`, [])
       .catch((e: any) =>
         console.log('ERROR -> ' + JSON.stringify(e))
-      );
+      ); */
   }
 
   setTables(sqliteObject: SQLiteObject) {
-    // Roles Table
+    /* // Roles Table
     sqliteObject.executeSql(`
-      INSERT INTO roles 
-      (id, label, description) 
-      values 
+      INSERT INTO roles
+      (id, label, description)
+      values
       (1, 'DEFAULT_ROLE', 'Rôle par défaut.')`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Users Table
     sqliteObject.executeSql(`
-      INSERT INTO users 
-      (id, firstname, lastname, username, address, token, role_id) 
-      values 
+      INSERT INTO users
+      (id, firstname, lastname, username, address, token, role_id)
+      values
       (1, 'demo', 'checker', 'demoUser', 'adresse', 'token', 1)`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Companies Table
     sqliteObject.executeSql(`
-      INSERT INTO companies 
-      (id, name, description) 
-      values 
+      INSERT INTO companies
+      (id, name, description)
+      values
       (1, 'malambi', 'Tracking & Services')`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Sites Table
     sqliteObject.executeSql(`
-      INSERT INTO sites 
-      (id, label, address, code, company_id, description) 
-      values 
+      INSERT INTO sites
+      (id, label, address, code, company_id, description)
+      values
       (1, 'malambi - akwa', 'Rue Bebe Elame, Akwa, Douala, Cameroun', 'malambiAkwa2', 1, 'Quatier Général')`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // User's sites Table
     sqliteObject.executeSql(`
-      INSERT INTO users_sites 
-      (id, user_id, site_id) 
-      values 
+      INSERT INTO users_sites
+      (id, user_id, site_id)
+      values
       (1, 1, 1)`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
     // Checkpoints Table
     sqliteObject.executeSql(`
-      INSERT INTO checkpoints 
-      (id, title, description, site_id) 
-      values 
+      INSERT INTO checkpoints
+      (id, title, description, site_id)
+      values
       (1, 'Bureau-DG', 'Bureau du DG', 1)`,
       []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
-
+ */
     // QRCodes Table
+    console.log('Setting table "qrcodes"...');
     sqliteObject.executeSql(`
       INSERT INTO qrcodes (
           company,
@@ -267,24 +275,29 @@ export class DataService {
             'name',
             'thumb'
           )`,
-      []
-    ).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
+      [])
+      .then(() => { console.log('Table "qrcodes" set.'); })
+      .catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
+
 
     // Checks Table
+    console.log('Setting table "checks"...');
     sqliteObject.executeSql(`
       INSERT INTO checks 
       (id, qrcode_id, user_id, location, is_incident, time, date) 
       values 
       (1, 1, 1, 'location', 0, '', '')`,
-      []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
+      [])
+      .then(() => { console.log('Table "checks" set.'); })
+      .catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
 
-    // Incidents Table
+    /* // Incidents Table
     sqliteObject.executeSql(`
-      INSERT INTO incidents 
-      (id, check_id, description) 
-      values 
+      INSERT INTO incidents
+      (id, check_id, description)
+      values
       (1, 1, 'description')`,
-      []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e)));
+      []).catch((e) => console.log('ERROR -> ' + JSON.stringify(e))); */
   }
 
   // get qrcodes

@@ -44,6 +44,7 @@ export class HomePage {
   }
 
   generateQRCode() {
+    console.log(this.io.latitude, this.io.longitude);
     const currentLocationString = `latitude:${this.io.latitude}, longitude:${this.io.latitude}`;
     const strings = [this.company, this.site, this.checkpoint, currentLocationString];
     this.encodedData = strings.join('%');
