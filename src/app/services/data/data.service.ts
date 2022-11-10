@@ -1,10 +1,15 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
+import { Storage } from '@ionic/storage-angular';
 import { BehaviorSubject, Observable } from 'rxjs';
+
 import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
+import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
+
 import { Check } from 'src/app/models/check/check';
 import { QRcode } from 'src/app/models/qrcode/qrcode';
 
@@ -17,19 +22,22 @@ export class DataService {
   // qrcodeList = [];
   checkList = new BehaviorSubject([]);
   // checkList = [];
+  private _storage: Storage | null = null;
   private db: SQLiteObject;
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private platform: Platform,
     private sqlite: SQLite,
+    private storage: Storage,
     // private httpClient: HttpClient,
     // private sqlPorter: SQLitePorter,
   ) {
     const platforms = this.platform.platforms();
     console.log({ platforms });
     this.platform.ready().then(() => {
-      this.initializeDatabase();
+      // this.initializeDatabase();
+      this.init();
     });
   }
 
@@ -37,9 +45,36 @@ export class DataService {
     return this.isDbReady.asObservable();
   }
 
-  initializeDatabase() {
+  async init() {
+    await this.storage.defineDriver(CordovaSQLiteDriver);
+    const storage = await this.storage.create();
+    this._storage = storage;
+  }
+
+  /**
+   * Method to set a data
+   */
+  public async set(key: string, value: any) {
+    await this._storage?.set(key, value);
+  }
+
+  /**
+   * Method to retrieve a data
+   */
+  public async get(key: string) {
+    return await this._storage?.get(key);
+  }
+
+  /**
+   * Method to remove a data
+   */
+  public async remove(key: string) {
+    await this._storage?.remove(key);
+  }
+
+  /* async initializeDatabase() {
     console.log('Initialize database...');
-    this.sqlite.create({
+    await this.sqlite.create({
       name: 'roundcheck.db',
       location: 'default'
     })
@@ -50,7 +85,7 @@ export class DataService {
         this.createTables(db);
         this.setTables(db);
       });
-  }
+  } */
 
 
   createTables(sqliteObject: SQLiteObject) {
