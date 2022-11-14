@@ -1,5 +1,5 @@
 export class QRcode {
-    id: number;
+    id: string;
     company: string;
     site: string;
     checkpoint: string;

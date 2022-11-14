@@ -22,6 +22,7 @@ export class DataService {
   // qrcodeList = [];
   checkList = new BehaviorSubject([]);
   // checkList = [];
+  public keys: string[];
   private _storage: Storage | null = null;
   private db: SQLiteObject;
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -70,6 +71,37 @@ export class DataService {
    */
   public async remove(key: string) {
     await this._storage?.remove(key);
+  }
+
+  /**
+   * Method to retrieve all keys
+   */
+  public async getKeys() {
+    return await this._storage?.keys();
+  }
+
+  /**
+   * Method to retrieve all datum
+   */
+  public async getAll() {
+    const items: QRcode[] = [];
+    if (this.keys.length > 0) {
+      this.keys.forEach(async k => {
+        const v = await this.get(k);
+        items.push({
+          id: k,
+          company: v.company,
+          site: v.site,
+          checkpoint: v.checkpoint,
+          location: v.location,
+          time: v.time,
+          date: v.date,
+          name: v.encodedData,
+          thumb: v.thumb
+        });
+      });
+    }
+    this.qrcodeList.next(items);
   }
 
   /* async initializeDatabase() {
