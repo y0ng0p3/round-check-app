@@ -9,28 +9,45 @@
 <ion-content [fullscreen]="true">
   <ion-card>
     <ion-button color="danger" (click)="scanQRcode()" expand="block">
-      Scan QRcode
+      Scanner Code QR
     </ion-button>
   </ion-card>
 
   <ion-card>
     <div *ngIf="scannedQRCode">
       <ion-item>
-        Scanned code output text: <strong>{{ scannedQRCode["text"] }}</strong>
+        Text du code scanné: <strong>{{ scannedQRCode["text"] }}</strong>
       </ion-item>
       <ion-item>
-        Scanned code output format: <strong>{{ scannedQRCode["format"] }}</strong>
+        Format du code scanné: <strong>{{ scannedQRCode["format"] }}</strong>
       </ion-item>
     </div>
   </ion-card>
 
   <ion-card>
-    <h3>Generate New QR Code</h3>
-    <ion-input placeholder="Enter Input" [(ngModel)]="encodedData"></ion-input>
+    <h3>Génerer un code QR</h3>
+    <ion-input placeholder="Taper" [(ngModel)]="encodedData"></ion-input>
 
     <ion-button color="primary" (click)="generateQRCode()" expand="block">
-        QR Code Create
+      Créer Code QR
     </ion-button>
-</ion-card>
+  </ion-card>
 
+</ion-content>
+
+<ion-content>
+  <h4>Check List</h4>
+  <ion-virtual-scroll [items]="listData" approxItemHeight="320px">
+    <ion-card *virtualItem="let item; let itemBounds = bounds;">
+      <ion-card-header>
+        <ion-card-title>{{ item.company }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <h5>Site: {{ item.site }}</h5>
+        <h6>Checkpoint: {{ item.checkpoint }}</h6>
+        <p>Localisation: {{ item.location.latitude }}, {{ item.location.longitude }}</p>
+        <p *ngIf="item.thumb">Encode: {{ item.thumb }}</p>
+      </ion-card-content>
+    </ion-card>
+  </ion-virtual-scroll>
 </ion-content>

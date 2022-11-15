@@ -22,7 +22,107 @@ export class DataService {
   // qrcodeList = [];
   checkList = new BehaviorSubject([]);
   // checkList = [];
-  public keys: string[];
+  public keys: string[] = [];
+  public dataList: QRcode[] = [
+    {
+      id: 0,
+      company: 'company 0',
+      site: 'site 0',
+      checkpoint: 'checkpoint 0',
+      location: {
+        latitude: 4.053321,
+        longitude: 9.701793
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 1,
+      company: 'company 1',
+      site: 'site 1',
+      checkpoint: 'checkpoint 1',
+      location: {
+        latitude: 4.053418,
+        longitude: 9.701647
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 2,
+      company: 'company 2',
+      site: 'site 2',
+      checkpoint: 'checkpoint 2',
+      location: {
+        latitude: 5.050751,
+        longitude: 9.702112
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 3,
+      company: 'company 3',
+      site: 'site 3',
+      checkpoint: 'checkpoint 3',
+      location: {
+        latitude: 4.050751,
+        longitude: 9.702112
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 4,
+      company: 'company 4',
+      site: 'site 4',
+      checkpoint: 'checkpoint 4',
+      location: {
+        latitude: 4.053458,
+        longitude: 9.701661
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 5,
+      company: 'company 5',
+      site: 'site 5',
+      checkpoint: 'checkpoint 5',
+      location: {
+        latitude: 4.053426,
+        longitude: 9.70169
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+    {
+      id: 6,
+      company: 'company 6',
+      site: 'site 6',
+      checkpoint: 'checkpoint 6',
+      location: {
+        latitude: 4.053408,
+        longitude: 9.701651
+      },
+      time: '',
+      date: '',
+      name: '',
+      thumb: null
+    },
+  ];
   private _storage: Storage | null = null;
   private db: SQLiteObject;
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -89,19 +189,25 @@ export class DataService {
       this.keys.forEach(async k => {
         const v = await this.get(k);
         items.push({
-          id: k,
+          id: parseInt(k, 10),
           company: v.company,
           site: v.site,
           checkpoint: v.checkpoint,
           location: v.location,
           time: v.time,
           date: v.date,
-          name: v.encodedData,
+          name: v.name,
           thumb: v.thumb
         });
       });
     }
     this.qrcodeList.next(items);
+  }
+
+  addDataList(data: QRcode) {
+    // alert(`ds: ${data.name}`);
+    // this.dataList.push(data);
+    this.dataList = [...this.dataList, data];
   }
 
   /* async initializeDatabase() {

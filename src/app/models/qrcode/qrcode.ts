@@ -1,9 +1,12 @@
 export class QRcode {
-    id: string;
+    id: number;
     company: string;
     site: string;
     checkpoint: string;
-    location: string;
+    location: {
+        latitude: number;
+        longitude: number;
+    };
     time: string;
     date: string;
     name?: string;
